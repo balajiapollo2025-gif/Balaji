@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sri Balaji Fancy Store — Supermarket App</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1F7A4D">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+  :root{
+    --green:#1F7A4D; --green-light:#E6F4EC; --green-dark:#155C3A;
+    --blue:#1D6FCB; --blue-light:#E7F0FC; --blue-dark:#14508F;
+    --amber:#B9770E; --amber-light:#FBF0DD; --amber-dark:#8A5A0A;
+    --red:#C0392B; --red-light:#FBEAE8; --red-dark:#922A20;
+    --ink:#1F2421; --ink-soft:#5B6058; --ink-faint:#8B9089;
+    --paper:#FFFFFF; --page-bg:#EDEBE3; --line:#E3E0D6;
+    --radius-sm:8px; --radius-md:12px; --radius-lg:18px;
+    --shadow:0 12px 30px rgba(31,36,33,0.14);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--page-bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  h1,p{margin:0;}
+  button{cursor:pointer;}
+  input{font-family:inherit;}
+
+  .phone{width:390px;max-width:100%;margin:32px auto;background:var(--paper);
+    border-radius:28px;box-shadow:var(--shadow);overflow:hidden;min-height:780px;
+    display:flex;flex-direction:column;}
+  @media (max-width:480px){
+    .phone{margin:0;border-radius:0;box-shadow:none;min-height:100vh;}
+  }
+
+  .topbar{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line);}
+  .topbar.hidden{display:none;}
+  .topbar button.back{background:none;border:none;color:var(--ink);display:flex;padding:4px;}
+  .topbar h1{font-size:16px;font-weight:600;}
+
+  .screen{display:none;padding:18px;flex:1;overflow-y:auto;}
+  .screen.active{display:block;}
+
+  .icon{width:18px;height:18px;display:inline-flex;align-items:center;vertical-align:middle;color:inherit;}
+  .icon svg{width:100%;height:100%;display:block;}
+
+  .home-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+  .avatar{width:40px;height:40px;border-radius:50%;background:var(--green-light);color:var(--green-dark);
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;}
+  .store-name{font-size:15px;font-weight:600;}
+  .store-loc{font-size:12px;color:var(--ink-soft);}
+
+  input[type=text],input[type=number]{width:100%;border:1px solid var(--line);border-radius:var(--radius-sm);
+    padding:10px 12px;font-size:14px;color:var(--ink);}
+  .search-input{margin-bottom:14px;}
+
+  .promo{background:var(--green-light);color:var(--green-dark);border-radius:var(--radius-lg);
+    padding:14px 16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;}
+  .promo .icon{width:26px;height:26px;}
+
+  .role-card{display:flex;align-items:center;gap:12px;border-radius:var(--radius-lg);padding:14px 16px;
+    margin-bottom:10px;border:none;width:100%;text-align:left;font:inherit;}
+  .role-card .icon-wrap{width:38px;height:38px;border-radius:var(--radius-sm);background:var(--paper);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .role-card .icon-wrap .icon{width:20px;height:20px;}
+  .role-card .title{font-size:14px;font-weight:600;}
+  .role-card .sub{font-size:12px;opacity:0.85;}
+  .role-card .chev{width:18px;height:18px;margin-left:auto;flex-shrink:0;}
+  .role-green{background:var(--green-light);color:var(--green-dark);}
+  .role-blue{background:var(--blue-light);color:var(--blue-dark);}
+  .role-amber{background:var(--amber-light);color:var(--amber-dark);}
+
+  .section-label{font-size:13px;font-weight:600;margin:18px 0 10px;}
+  .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+  .stat-card{border-radius:var(--radius-md);padding:10px 8px;}
+  .stat-card .label{font-size:10px;margin-bottom:4px;opacity:0.85;}
+  .stat-card .value{font-size:15px;font-weight:700;}
+  .stat-green{background:var(--green-light);color:var(--green-dark);}
+  .stat-blue{background:var(--blue-light);color:var(--blue-dark);}
+  .stat-amber{background:var(--amber-light);color:var(--amber-dark);}
+  .stat-red{background:var(--red-light);color:var(--red-dark);}
+
+  .bottom-nav{display:flex;justify-content:space-around;padding:10px 0;border-top:1px solid var(--line);}
+  .bottom-nav button{background:none;border:none;display:flex;flex-direction:column;align-items:center;
+    gap:3px;font-size:10px;color:var(--ink-faint);font:inherit;}
+  .bottom-nav button.active{color:var(--green-dark);}
+  .bottom-nav .icon{width:20px;height:20px;}
+
+  table.bill-table{width:100%;border-collapse:collapse;margin-bottom:10px;table-layout:fixed;}
+  table.bill-table th{font-size:11px;color:var(--ink-soft);text-align:left;font-weight:600;padding:4px;}
+  table.bill-table td{padding:4px;}
+  table.bill-table input{padding:7px 6px;font-size:13px;border:1px solid var(--line);border-radius:6px;}
+  .total-cell{font-size:13px;font-weight:600;text-align:right;padding-right:4px !important;}
+  .remove-btn{background:none;border:none;color:var(--ink-faint);display:flex;align-items:center;justify-content:center;}
+  .remove-btn .icon{width:15px;height:15px;}
+
+  .btn{display:flex;align-items:center;justify-content:center;gap:6px;border:none;border-radius:var(--radius-sm);
+    padding:11px 16px;font-size:13px;font-weight:600;font-family:inherit;width:100%;}
+  .btn .icon{width:15px;height:15px;}
+  .btn-outline{background:var(--paper);border:1px solid var(--line);color:var(--ink);}
+  .btn-primary{background:var(--blue);color:#fff;}
+  .btn-primary:hover{background:var(--blue-dark);}
+
+  .totals-card{background:var(--page-bg);border-radius:var(--radius-lg);padding:14px 16px;margin:14px 0;}
+  .totals-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:13px;}
+  .totals-row input{width:64px;text-align:right;padding:6px 8px;font-size:13px;border:1px solid var(--line);border-radius:6px;}
+  .divider{border-top:1px dashed var(--line);margin:8px 0;}
+  .grand-row{display:flex;justify-content:space-between;align-items:center;padding-top:8px;
+    border-top:1px solid var(--line);margin-top:4px;}
+  .grand-row .label{font-size:14px;font-weight:600;}
+  .grand-row .value{font-size:18px;font-weight:700;}
+  .error-msg{color:var(--red);font-size:12px;text-align:center;min-height:16px;margin-top:6px;}
+
+  .receipt{font-family:"Courier New",monospace;background:var(--paper);border:1px solid var(--line);
+    border-radius:var(--radius-md);padding:18px 16px;max-width:300px;margin:0 auto;}
+  .receipt-center{text-align:center;}
+  .receipt-shop-name{font-size:15px;font-weight:700;margin-bottom:4px;}
+  .receipt-addr{font-size:11px;color:var(--ink-soft);line-height:1.6;}
+  .receipt-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-soft);margin:8px 0;}
+  .receipt-row{display:grid;grid-template-columns:2fr 0.6fr 0.8fr 0.9fr;font-size:12px;padding:3px 0;}
+  .receipt-row.head{font-size:10px;color:var(--ink-soft);font-weight:600;}
+  .qr-wrap{text-align:center;margin:10px 0;}
+  .qr-wrap svg{width:100px;height:100px;}
+  .qr-wrap img{width:130px;height:130px;}
+  .receipt-thanks{text-align:center;font-size:11px;color:var(--ink-soft);margin-top:10px;}
+
+  .placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:60px 20px;color:var(--ink-soft);}
+  .placeholder .icon{width:40px;height:40px;margin-bottom:12px;opacity:0.5;}
+
+  .list-row{display:flex;align-items:center;gap:10px;padding:12px 4px;border:none;
+    border-bottom:1px solid var(--line);width:100%;background:none;text-align:left;
+    font:inherit;color:var(--ink-soft);}
+  .list-row .icon{width:18px;height:18px;}
+  .list-row .chev{margin-left:auto;width:16px;height:16px;}
+
+  .inv-form{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;margin-bottom:10px;}
+  .inv-list{margin-top:4px;}
+  .inv-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);}
+  .inv-row .name{flex:1;font-size:13px;font-weight:600;}
+  .inv-row .meta{font-size:11px;color:var(--ink-soft);font-weight:400;margin-top:2px;}
+  .inv-empty{font-size:12px;color:var(--ink-soft);text-align:center;padding:20px 0;}
+
+  .report-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);}
+  .report-row .info{flex:1;cursor:pointer;}
+  .report-row .billno{font-size:13px;font-weight:600;}
+  .report-row .meta{font-size:11px;color:var(--ink-soft);margin-top:2px;}
+  .report-row .actions{display:flex;gap:2px;}
+
+  .note-box{background:var(--blue-light);color:var(--blue-dark);border-radius:var(--radius-md);
+    padding:12px 14px;font-size:12px;line-height:1.6;margin-bottom:14px;}
+  .steps-list{font-size:12px;color:var(--ink-soft);line-height:1.8;padding-left:18px;margin-bottom:16px;}
+  .printer-status{font-size:12px;color:var(--green-dark);text-align:center;margin-top:8px;min-height:14px;}
+
+  @media print{
+    body{background:#fff;}
+    .phone{box-shadow:none;border-radius:0;width:80mm;margin:0;}
+    .topbar,.bottom-nav,.no-print{display:none !important;}
+    #screen-home,#screen-billing,#screen-inventory,#screen-reports{display:none !important;}
+    #screen-receipt{display:block !important;padding:0;}
+    @page{size:80mm auto;margin:4mm;}
+  }
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <div class="topbar hidden" id="topbar">
+    <button class="back" id="back-btn"><span class="icon" data-icon="arrowLeft"></span></button>
+    <h1 id="topbar-title">Billing</h1>
+  </div>
+
+  <section class="screen active" id="screen-home">
+    <div class="home-header">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="avatar">SB</div>
+        <div>
+          <p class="store-name">Sri Balaji Fancy Store</p>
+          <p class="store-loc">Chittoor, S.R.Puram</p>
+        </div>
+      </div>
+      <span class="icon" data-icon="bell" style="width:20px;height:20px;color:var(--ink-soft);"></span>
+    </div>
+
+    <input class="search-input" type="text" placeholder="Search products, bills, stock...">
+
+    <button class="role-card role-blue" onclick="startNewBill()">
+      <span class="icon-wrap"><span class="icon" data-icon="receipt"></span></span>
+      <div><p class="title">Billing</p><p class="sub">New bill, discount & QR pay</p></div>
+      <span class="icon chev" data-icon="chevronRight"></span>
+    </button>
+    <button class="role-card role-amber" onclick="showScreen('inventory')">
+      <span class="icon-wrap"><span class="icon" data-icon="box"></span></span>
+      <div><p class="title">Inventory</p><p class="sub">Stock & suppliers</p></div>
+      <span class="icon chev" data-icon="chevronRight"></span>
+    </button>
+    <button class="role-card role-green" onclick="showScreen('reports')">
+      <span class="icon-wrap"><span class="icon" data-icon="chart"></span></span>
+      <div><p class="title">Reports</p><p class="sub">Saved bills, edit & delete</p></div>
+      <span class="icon chev" data-icon="chevronRight"></span>
+    </button>
+
+    <button class="list-row" onclick="showScreen('printer')">
+      <span class="icon" data-icon="printer"></span>
+      <span>Printer settings</span>
+      <span class="icon chev" data-icon="chevronRight"></span>
+    </button>
+
+    <p class="section-label" style="margin-top:18px;">Today's overview</p>
+    <div class="stats-grid">
+      <div class="stat-card stat-green"><p class="label">Revenue</p><p class="value">₹48,250</p></div>
+      <div class="stat-card stat-blue"><p class="label">Bills today</p><p class="value">42</p></div>
+      <div class="stat-card stat-red"><p class="label">Low stock</p><p class="value">7 items</p></div>
+    </div>
+  </section>
+
+  <section class="screen" id="screen-billing">
+    <datalist id="catalog"></datalist>
+    <table class="bill-table">
+      <colgroup><col style="width:38%"><col style="width:14%"><col style="width:22%"><col style="width:20%"><col style="width:6%"></colgroup>
+      <thead><tr><th>Product</th><th style="text-align:center;">Qty</th><th style="text-align:right;">Price</th><th style="text-align:right;">Total</th><th></th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <button class="btn btn-outline" id="add-row" style="margin-bottom:14px;"><span class="icon" data-icon="plus"></span>Add product</button>
+
+    <div class="totals-card">
+      <div class="totals-row"><span>Subtotal</span><span id="subtotal">₹0.00</span></div>
+      <div class="totals-row"><span>Discount %</span><input type="number" id="discount-in" value="0" min="0" max="100" step="1"></div>
+      <div class="grand-row"><span class="label">Grand total</span><span class="value" id="grand-total">₹0.00</span></div>
+    </div>
+
+    <p class="section-label" style="margin-top:4px;">Remarks (optional)</p>
+    <input type="text" id="remarks-in" placeholder="e.g. customer name, delivery note..." style="margin-bottom:14px;">
+
+    <button class="btn btn-primary" id="save-bill"><span class="icon" data-icon="receipt"></span><span id="save-bill-label">Save bill</span></button>
+    <p class="error-msg" id="save-msg"></p>
+  </section>
+
+  <section class="screen" id="screen-receipt">
+    <div class="receipt">
+      <div class="receipt-center">
+        <p class="receipt-shop-name">Sri Balaji Fancy Store</p>
+        <p class="receipt-addr">49, Kothapallimitta<br>S.R.Puram (Md)<br>Chittoor (Dist)<br>Cell: 9866086614</p>
+      </div>
+      <div class="divider"></div>
+      <div class="receipt-meta"><span id="receipt-billno">Bill no: 0001</span><span id="receipt-date"></span></div>
+      <div class="divider"></div>
+      <div class="receipt-row head"><span>Item</span><span style="text-align:center;">Qty</span><span style="text-align:right;">Price</span><span style="text-align:right;">Amt</span></div>
+      <div id="receipt-items"></div>
+      <div class="divider"></div>
+      <div class="receipt-row" style="grid-template-columns:1fr 1fr;"><span>Subtotal</span><span style="text-align:right;" id="receipt-subtotal">0.00</span></div>
+      <div class="receipt-row" style="grid-template-columns:1fr 1fr;color:var(--ink-soft);"><span id="receipt-discount-label">Discount</span><span style="text-align:right;" id="receipt-discount">0.00</span></div>
+      <div class="divider"></div>
+      <div class="receipt-row" style="grid-template-columns:1fr 1fr;font-size:15px;font-weight:700;"><span>Total</span><span style="text-align:right;" id="receipt-total">₹0.00</span></div>
+      <div class="divider"></div>
+      <div class="qr-wrap">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjoAAAI6AQAAAAAGM99tAAAFeUlEQVR42u2dQZaiPBDHq7TnyU52s6Rv0txMvpvFI8wN9Ab0Dt9zrG8RKySILWLEyPyzolF+XQlJWVWpJCwUpWwXFKkANKDswj+XIiIiNa3shaFCRIRoIzv92N47TVu1OhYox+sHCKD3GmuXEpnbiu2swkREGlrK+ffJ3XWarxCRY3t5ImofFPQjgAACKCWLbaXGV6GK7atVWIYKaYg8i0313olIxKiZZyU6obEBAgigRBTbMVBsIobWapIZa7ypmSbtZZ9ie4c2gisKEBy/d5XIDAV9XN5iIvrmVXO+JCKiIH76ZdAhAQIIoNRBy0407UsvRSoiOrBfgset03ocoLNLNDZAAAE0HcjTW1nPNwpprIYrpNYY295+01d3aGyAAALoUdB179UF8JtBoLUE5agfHPiXKrHfIszWoPvLTLTlTyLi4DmDtwYQQAAFpY4Fyu8XqabzXOdGxM5/auaHXzS7jYg27dyCM+iIzOLuSlT9ArdVM2/9+uufQOUdoBm3EUCpgMpYIDO1RNUVUKHajPnTJq+pSUZENojWEDHb55cizBv5Y11RLzBXXpGo/lmienAb5bFef51ch8wx1gBK39DKYvXs5hborqwxtY+6D3XMtGWbq0s2n6PwM3WXnVTeL9F0kfGNfUKHBAgggKKCVDu3MTbW7LSzxbbzNdzR3qs1q9fNiva4oleW2JnB/hreGkAAAXRH8bzFnfqfG98Oq4mIvUUI/SG4/skDM2HVGrx+gGbpr0WTqHmhRBSrjUa9tYNmp+15LQd7uZZue/zHzOt20tTd/bTPlw9WrcRYAwgggKK5ojt1Ra2htWx37eBgJZXNYzuXQhqb7uFCcD0WGyfTRmUs0ABjNIslURNLomhtlMWSCHY2QM8BmRDEIsyVv32HZ7HtOSNiFtny2UR1CxM0u82BFqOtWjMXX2QEKJ+vRBhrcNenlMj7eRZ/M6JGNVdt5zq9fI6N5rHpwnjnla7s5MH1qi1+/u1fPDDWmliNPd1c9uSRCNhHACUFymIN2mjhw+dE/S7TPQ68CraFI3LWInPZKuBAvx74V5Cqgn4EEECzBZlYoHKqqqkN6aXO6TwtBROxFRXt5OyOvKDgKxUb7COAEvfX/uVIxBSNXV25vwv9XOnZIY7Udw7kHLZ6NcdYAwgggKYGtZl13taX7hQGZ5J5q1d1n19u10JgWT5AAAH0EtOvov65Bbeyq/I37V1rhokLornpDNVmp/YyPIWhfIrF9ohVa57S2ElUDd4RQDNzRZsrq1dvzIp2Jw/2nJMw2wwT5g9rkn376cEr3VFprZ4q0YHdbsD28gltNEAfpZfHFk2iV+psgAAaOUQo1hB5VCJv0rMQ0bUQ5+I2xPQ2961oy58XCSgPRP0W6EcAATQKlN4PZPnSNvL+eyfGRq268tbdn0867WbbPabY5tkhMwxagCYFNbFAWQoW2/UoyKlfourK1+WiELm1EO7cLC8bpFL3VL3SsW+tek0/yjFEAIoAqudbtTy5NsrvVyP74OwYjZzt2xhbId/2oy+p6S+z6jixTqvb0/ceYbNYig15bADN085Gz37srfWcTa9mmj/t6TmdVrF5FtsIVxT+GkDzVCMZqpZG1XqPcLY6zt9vRM+mJ8TYAAIIoHRAwx0/Znsgg7/ywEtzs15pcMLWB43NrOsRAZtyoGoAzQNUR5fIPAASEXFHmYrsyKWAHDTNbc+s5wXesNjqXokCG/I07Vh7l9GP/UYASgo03TYhQ/dj69+2KLOXlzE2PSzLXzOlPunRLkEIckTGnnRaoR8BBNA/DMpjuaJ9CnQX/rkMUtrcph79cwvqoN7YIY6IOol7lzq7hMUGEPy1NCQaYB91CkscgbbpvbX/AaMOIlPbqCe9AAAAAElFTkSuQmCC" alt="Sri Balaji Fancy Store payment QR code" style="width:130px;height:130px;display:block;margin:0 auto;image-rendering:pixelated;">
+        <p style="font-size:11px;color:var(--ink-soft);margin-top:6px;" id="receipt-qr-label">Scan & pay ₹0.00</p>
+        <p style="font-size:10px;color:var(--ink-faint);margin-top:2px;">UPI ID: paytmqr5ftk5t@ptys</p>
+      </div>
+      <p id="receipt-remarks" style="font-size:13px;color:var(--ink);font-weight:600;margin-top:8px;"></p>
+      <div class="divider"></div>
+      <p class="receipt-thanks">Thank you! Visit again</p>
+    </div>
+    <button class="btn btn-primary no-print" id="print-btn" style="margin-top:14px;"><span class="icon" data-icon="printer"></span>Print receipt</button>
+    <button class="btn btn-outline no-print" id="new-bill-btn" style="margin-top:8px;">New bill</button>
+  </section>
+
+  <section class="screen" id="screen-inventory">
+    <p class="section-label" style="margin-top:0;">Add product</p>
+    <div class="inv-form">
+      <input type="text" id="inv-name" placeholder="Product name">
+      <input type="number" id="inv-price" placeholder="Price" min="0" step="0.5">
+      <input type="number" id="inv-stock" placeholder="Stock" min="0" step="1">
+    </div>
+    <button class="btn btn-outline" id="inv-add-btn"><span class="icon" data-icon="plus"></span>Add to inventory</button>
+
+    <p class="section-label">Current stock</p>
+    <div class="inv-list" id="inv-list"></div>
+  </section>
+
+  <section class="screen" id="screen-reports">
+    <p class="section-label" style="margin-top:0;">Saved bills</p>
+    <div id="reports-list"></div>
+  </section>
+
+  <section class="screen" id="screen-printer">
+    <div class="note-box">Browsers can't hold a direct Bluetooth connection to thermal printers — most 80mm printers use classic Bluetooth, which web pages simply can't reach. The reliable way on Android: pair the printer once in your phone's Bluetooth settings, then use a print-bridge app like <strong style="font-weight:600;">RawBT</strong> as your default print service. After that, every "Print receipt" tap reuses the same paired printer automatically — even after restarting the printer or this app.</div>
+
+    <p class="section-label" style="margin-top:0;">Setup steps</p>
+    <ol class="steps-list">
+      <li>Turn on the printer and pair it once in your phone's Bluetooth settings</li>
+      <li>Install a print-bridge app (e.g. RawBT) from the Play Store</li>
+      <li>Set it as your default print service</li>
+      <li>Open this app and tap "Print receipt" — it prints on the same printer every time</li>
+    </ol>
+
+    <p class="section-label">Printer name (for your reference)</p>
+    <input type="text" id="printer-name-in" placeholder="e.g. RPP02, MPT-II 80mm">
+    <button class="btn btn-primary" id="printer-save-btn" style="margin-top:10px;">Save</button>
+    <p class="printer-status" id="printer-status"></p>
+  </section>
+
+  <nav class="bottom-nav" id="bottom-nav">
+    <button data-screen="home" class="active"><span class="icon" data-icon="home"></span>Home</button>
+    <button data-screen="billing"><span class="icon" data-icon="receipt"></span>Billing</button>
+    <button data-screen="inventory"><span class="icon" data-icon="box"></span>Inventory</button>
+  </nav>
+</div>
+
+<script>
+const ICONS = {
+  home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 21v-6h6v6"/></svg>',
+  bag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7L6 7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>',
+  receipt: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-2-1-2 1-2-1-2 1-2-1-2 1V3z"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>',
+  box: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/></svg>',
+  bell: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-2 9-2 9h16s-2-2-2-9"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>',
+  percent: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 5L5 19"/><circle cx="6.5" cy="6.5" r="2.3"/><circle cx="17.5" cy="17.5" r="2.3"/></svg>',
+  chevronRight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>',
+  x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  printer: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V4h12v5"/><rect x="4" y="9" width="16" height="8" rx="1"/><path d="M8 13h8M6 17h12v4H6z"/></svg>',
+  arrowLeft: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>',
+  chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V12M10 20V4M16 20V14M3 20h18"/></svg>',
+  pencil: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>',
+  trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>'
+};
+document.querySelectorAll('[data-icon]').forEach(el => { el.innerHTML = ICONS[el.dataset.icon] || ''; });
+
+const store = {
+  get(key, fallback){ try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch(e){ return fallback; } },
+  set(key, value){ try{ localStorage.setItem(key, JSON.stringify(value)); } catch(e){ /* storage unavailable, stays in-memory for this session */ } }
+};
+
+let savedCatalog = store.get('catalog', []);
+let inventory = store.get('inventory', []);
+
+function refreshCatalogDatalist(){
+  const catalogEl = document.getElementById('catalog');
+  const names = new Set([...savedCatalog, ...inventory.map(p=>p.name)]);
+  catalogEl.innerHTML = '';
+  names.forEach(n=>{ const opt=document.createElement('option'); opt.value=n; catalogEl.appendChild(opt); });
+}
+
+const screens = ['home','billing','receipt','inventory','reports','printer'];
+const topbar = document.getElementById('topbar');
+const topbarTitle = document.getElementById('topbar-title');
+const bottomNav = document.getElementById('bottom-nav');
+const titles = { billing:'Billing', receipt:'Receipt', inventory:'Inventory', reports:'Reports', printer:'Printer settings' };
+
+function showScreen(name){
+  screens.forEach(s => document.getElementById('screen-'+s).classList.toggle('active', s===name));
+  if(name==='home'){ topbar.classList.add('hidden'); }
+  else { topbar.classList.remove('hidden'); topbarTitle.textContent = titles[name] || ''; }
+  bottomNav.querySelectorAll('button').forEach(b=>{
+    const navTarget = (name==='receipt') ? 'billing' : ((name==='reports' || name==='printer') ? 'home' : name);
+    b.classList.toggle('active', b.dataset.screen===navTarget);
+  });
+  if(name==='reports') renderReports();
+  window.scrollTo(0,0);
+}
+document.getElementById('back-btn').addEventListener('click', ()=>showScreen('home'));
+bottomNav.querySelectorAll('button').forEach(b=>b.addEventListener('click', ()=>{
+  if(b.dataset.screen==='billing') startNewBill(); else showScreen(b.dataset.screen);
+}));
+
+const rowsBody = document.getElementById('rows');
+const grandTotalEl = document.getElementById('grand-total');
+const subtotalEl = document.getElementById('subtotal');
+const discountIn = document.getElementById('discount-in');
+const saveMsg = document.getElementById('save-msg');
+const catalog = document.getElementById('catalog');
+let billCounter = store.get('billCounter', 1);
+let bills = store.get('bills', []);
+let editingBillIndex = null;
+
+function fmt(n){ return '₹' + n.toFixed(2); }
+
+function recalcGrand(){
+  let sum=0;
+  rowsBody.querySelectorAll('tr').forEach(tr=>{
+    const qty=parseFloat(tr.querySelector('.qty-in').value)||0;
+    const price=parseFloat(tr.querySelector('.price-in').value)||0;
+    sum += qty*price;
+  });
+  subtotalEl.textContent = fmt(sum);
+  const discount = Math.min(100, Math.max(0, parseFloat(discountIn.value)||0));
+  grandTotalEl.textContent = fmt(sum - sum*discount/100);
+}
+
+function recalcRow(tr){
+  const qty=parseFloat(tr.querySelector('.qty-in').value)||0;
+  const price=parseFloat(tr.querySelector('.price-in').value)||0;
+  tr.querySelector('.total-cell').textContent = fmt(qty*price);
+  recalcGrand();
+}
+
+function addRow(name,qty,price){
+  const tr=document.createElement('tr');
+  tr.innerHTML = `
+    <td><input type="text" class="name-in" list="catalog" placeholder="Product name" value="${name||''}" style="width:100%;"></td>
+    <td><input type="number" class="qty-in" min="0" step="1" value="${qty!=null?qty:''}" style="width:100%;text-align:center;"></td>
+    <td><input type="number" class="price-in" min="0" step="0.5" value="${price!=null?price:''}" style="width:100%;text-align:right;"></td>
+    <td class="total-cell">₹0.00</td>
+    <td><button class="remove-btn" type="button"><span class="icon"></span></button></td>
+  `;
+  rowsBody.appendChild(tr);
+  tr.querySelector('.remove-btn .icon').innerHTML = ICONS.x;
+  tr.querySelector('.qty-in').addEventListener('input', ()=>recalcRow(tr));
+  tr.querySelector('.price-in').addEventListener('input', ()=>recalcRow(tr));
+  tr.querySelector('.remove-btn').addEventListener('click', ()=>{ tr.remove(); recalcGrand(); });
+  recalcRow(tr);
+}
+
+addRow('',null,null);
+refreshCatalogDatalist();
+
+document.getElementById('add-row').addEventListener('click', ()=>addRow('',null,null));
+discountIn.addEventListener('input', recalcGrand);
+
+function pad4(n){ return String(n).padStart(4,'0'); }
+function formatDate(d){
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  let h=d.getHours(); const ampm=h>=12?'PM':'AM'; h=h%12; if(h===0)h=12;
+  const m=String(d.getMinutes()).padStart(2,'0');
+  return d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear()+', '+h+':'+m+' '+ampm;
+}
+
+function populateReceipt(bill){
+  document.getElementById('receipt-billno').textContent='Bill no: '+bill.billNo;
+  document.getElementById('receipt-date').textContent=bill.date;
+  document.getElementById('receipt-items').innerHTML = bill.items.map(it=>
+    '<div class="receipt-row"><span>'+it.name+'</span><span style="text-align:center;">'+it.qty+
+    '</span><span style="text-align:right;">'+it.price.toFixed(2)+'</span><span style="text-align:right;">'+it.total.toFixed(2)+'</span></div>'
+  ).join('');
+  document.getElementById('receipt-subtotal').textContent=bill.subtotal.toFixed(2);
+  document.getElementById('receipt-discount-label').textContent='Discount ('+bill.discountPct+'%)';
+  document.getElementById('receipt-discount').textContent='-'+bill.discountAmt.toFixed(2);
+  document.getElementById('receipt-total').textContent=fmt(bill.grandTotal);
+  document.getElementById('receipt-qr-label').textContent='Scan & pay '+fmt(bill.grandTotal);
+  document.getElementById('receipt-remarks').textContent = bill.remarks ? ('Note: '+bill.remarks) : '';
+}
+
+function startNewBill(){
+  editingBillIndex = null;
+  document.getElementById('save-bill-label').textContent = 'Save bill';
+  rowsBody.innerHTML = '';
+  discountIn.value = 0;
+  document.getElementById('remarks-in').value = '';
+  saveMsg.textContent = '';
+  addRow('',null,null);
+  showScreen('billing');
+}
+
+function viewBill(i){ populateReceipt(bills[i]); showScreen('receipt'); }
+
+function editBill(i){
+  const b = bills[i];
+  rowsBody.innerHTML='';
+  b.items.forEach(it=>addRow(it.name,it.qty,it.price));
+  discountIn.value = b.discountPct;
+  document.getElementById('remarks-in').value = b.remarks || '';
+  recalcGrand();
+  editingBillIndex = i;
+  document.getElementById('save-bill-label').textContent = 'Update bill';
+  showScreen('billing');
+}
+
+function renderReports(){
+  const list = document.getElementById('reports-list');
+  if(bills.length===0){ list.innerHTML = '<p class="inv-empty">No bills saved yet</p>'; return; }
+  list.innerHTML = bills.map((b,i)=>
+    '<div class="report-row">'+
+      '<div class="info" data-idx="'+i+'"><div class="billno">Bill '+b.billNo+' &middot; '+fmt(b.grandTotal)+'</div>'+
+      '<div class="meta">'+b.date+(b.remarks ? (' &middot; '+b.remarks) : '')+'</div></div>'+
+      '<div class="actions">'+
+        '<button class="remove-btn edit-bill-btn" type="button" data-idx="'+i+'"><span class="icon">'+ICONS.pencil+'</span></button>'+
+        '<button class="remove-btn delete-bill-btn" type="button" data-idx="'+i+'"><span class="icon">'+ICONS.trash+'</span></button>'+
+      '</div>'+
+    '</div>'
+  ).join('');
+  list.querySelectorAll('.info').forEach(el=>el.addEventListener('click', ()=>viewBill(parseInt(el.dataset.idx))));
+  list.querySelectorAll('.edit-bill-btn').forEach(b=>b.addEventListener('click', (e)=>{ e.stopPropagation(); editBill(parseInt(b.dataset.idx)); }));
+  list.querySelectorAll('.delete-bill-btn').forEach(b=>b.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    if(confirm('Delete this bill?')){
+      bills.splice(parseInt(b.dataset.idx),1);
+      store.set('bills', bills);
+      renderReports();
+    }
+  }));
+}
+renderReports();
+
+document.getElementById('save-bill').addEventListener('click', ()=>{
+  const items=[];
+  rowsBody.querySelectorAll('tr').forEach(tr=>{
+    const name=tr.querySelector('.name-in').value.trim();
+    const qty=parseFloat(tr.querySelector('.qty-in').value)||0;
+    const price=parseFloat(tr.querySelector('.price-in').value)||0;
+    if(name) items.push({name,qty,price,total:qty*price});
+  });
+  if(items.length===0){ saveMsg.textContent='Add at least one product to save'; return; }
+  saveMsg.textContent='';
+
+  items.forEach(it=>{ if(!savedCatalog.includes(it.name)) savedCatalog.push(it.name); });
+  store.set('catalog', savedCatalog);
+  refreshCatalogDatalist();
+
+  const subtotal=items.reduce((s,it)=>s+it.total,0);
+  const discountPct=Math.min(100,Math.max(0,parseFloat(discountIn.value)||0));
+  const discountAmt=subtotal*discountPct/100;
+  const grandTotal=subtotal-discountAmt;
+  const remarksVal = document.getElementById('remarks-in').value.trim();
+
+  let bill;
+  if(editingBillIndex!==null){
+    bill = bills[editingBillIndex];
+    bill.items=items; bill.subtotal=subtotal; bill.discountPct=discountPct;
+    bill.discountAmt=discountAmt; bill.grandTotal=grandTotal; bill.remarks=remarksVal;
+  } else {
+    bill = { billNo: pad4(billCounter), date: formatDate(new Date()), items, subtotal, discountPct, discountAmt, grandTotal, remarks: remarksVal };
+    bills.push(bill);
+    billCounter++;
+    store.set('billCounter', billCounter);
+  }
+  store.set('bills', bills);
+  renderReports();
+
+  populateReceipt(bill);
+
+  editingBillIndex = null;
+  document.getElementById('save-bill-label').textContent = 'Save bill';
+  rowsBody.innerHTML='';
+  discountIn.value=0;
+  document.getElementById('remarks-in').value='';
+  addRow('',null,null);
+
+  showScreen('receipt');
+});
+
+function renderInventory(){
+  const list = document.getElementById('inv-list');
+  if(inventory.length===0){ list.innerHTML = '<p class="inv-empty">No products added yet</p>'; return; }
+  list.innerHTML = inventory.map((p,i)=>
+    '<div class="inv-row"><div class="name">'+p.name+'<div class="meta">'+fmt(p.price)+' &middot; Stock: '+p.stock+'</div></div>'+
+    '<button class="remove-btn" type="button" data-idx="'+i+'"><span class="icon">'+ICONS.x+'</span></button></div>'
+  ).join('');
+  list.querySelectorAll('.remove-btn').forEach(b=>b.addEventListener('click', ()=>{
+    inventory.splice(parseInt(b.dataset.idx),1);
+    store.set('inventory', inventory);
+    renderInventory();
+    refreshCatalogDatalist();
+  }));
+}
+renderInventory();
+
+document.getElementById('inv-add-btn').addEventListener('click', ()=>{
+  const name=document.getElementById('inv-name').value.trim();
+  const price=parseFloat(document.getElementById('inv-price').value)||0;
+  const stock=parseFloat(document.getElementById('inv-stock').value)||0;
+  if(!name) return;
+  inventory.push({name,price,stock});
+  store.set('inventory', inventory);
+  document.getElementById('inv-name').value='';
+  document.getElementById('inv-price').value='';
+  document.getElementById('inv-stock').value='';
+  renderInventory();
+  refreshCatalogDatalist();
+});
+
+const printerNameIn = document.getElementById('printer-name-in');
+const printerStatus = document.getElementById('printer-status');
+printerNameIn.value = store.get('printerName','');
+document.getElementById('printer-save-btn').addEventListener('click', ()=>{
+  store.set('printerName', printerNameIn.value.trim());
+  printerStatus.textContent='Saved';
+  setTimeout(()=>printerStatus.textContent='', 1200);
+});
+
+document.getElementById('print-btn').addEventListener('click', ()=>window.print());
+document.getElementById('new-bill-btn').addEventListener('click', ()=>startNewBill());
+
+showScreen('home');
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
