@@ -2,8 +2,8 @@
 
 ## GitHub Pages లో పెట్టడం (deploy)
 
-1. github.com లో కొత్త repository create చేయండి (public).
-2. ఈ zip లో ఉన్న 4 items (`index.html`, `manifest.json`, `sw.js`, `icons/` folder) ని repo root లోకి upload చేయండి.
+1. github.com లో కొత్త repository create చేయండి (public). [ఈ repo ఇప్పటికే ఉంటే, ఈ దశ skip చేయండి.]
+2. ఈ zip లో ఉన్న 6 ఫైల్స్ (అన్నీ ఒకే లెవల్‌లో, ఏ ఫోల్డర్ లేకుండా) repo root లోకి upload చేయండి — `index.html`, `manifest.json`, `sw.js`, `icon-192.png`, `icon-512.png`, `README.md`. ఫోల్డర్ create చేయాల్సిన అవసరం లేదు, అన్నీ ఒకేసారి select చేసి upload చేయొచ్చు.
 3. Repo లో: Settings → Pages → Source → "Deploy from a branch" → Branch: `main`, folder: `/ (root)` → Save.
 4. 1-2 నిమిషాల తర్వాత మీకు ఒక లింక్ వస్తుంది: `https://<your-username>.github.io/<repo-name>/`
 
