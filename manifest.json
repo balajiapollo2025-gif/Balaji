@@ -1,15 +1,25 @@
 {
-  "name": "Sri Balaji Fancy Store",
-  "short_name": "SBF Store",
-  "description": "Billing, inventory and receipts for Sri Balaji Fancy Store",
+  "name": "New Fancy Store",
+  "short_name": "NF Store",
+  "description": "Billing, inventory and receipts for New Fancy Store",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#EDEBE3",
-  "theme_color": "#1F7A4D",
+  "background_color": "#FFFFFF",
+  "theme_color": "#11151A",
   "orientation": "portrait",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
   ]
 }

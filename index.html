@@ -3,23 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sri Balaji Fancy Store — Supermarket App</title>
+<title>New Fancy Store — Supermarket App</title>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#1F7A4D">
+<meta name="theme-color" content="#11151A">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
   :root{
-    --green:#1F7A4D; --green-light:#E6F4EC; --green-dark:#155C3A;
-    --blue:#1D6FCB; --blue-light:#E7F0FC; --blue-dark:#14508F;
-    --amber:#B9770E; --amber-light:#FBF0DD; --amber-dark:#8A5A0A;
-    --red:#C0392B; --red-light:#FBEAE8; --red-dark:#922A20;
-    --ink:#1F2421; --ink-soft:#5B6058; --ink-faint:#8B9089;
-    --paper:#FFFFFF; --page-bg:#EDEBE3; --line:#E3E0D6;
+    --green:#1F7A4D; --green-light:#0F2A20; --green-dark:#52E0A3;
+    --blue:#1D6FCB; --blue-light:#0E2236; --blue-dark:#7AB6F2;
+    --amber:#B9770E; --amber-light:#2E2110; --amber-dark:#F0B454;
+    --red:#C0392B; --red-light:#2E1416; --red-dark:#F38B82;
+    --ink:#EDEFF2; --ink-soft:#9AA3AE; --ink-faint:#5E6772;
+    --paper:#1B2027; --page-bg:#11151A; --line:#2B323B;
     --radius-sm:8px; --radius-md:12px; --radius-lg:18px;
-    --shadow:0 12px 30px rgba(31,36,33,0.14);
-    --accent:#1F7A4D; --accent-light:#E6F4EC; --accent-dark:#155C3A;
+    --shadow:0 12px 30px rgba(0,0,0,0.45);
+    --accent:#259969; --accent-light:#1F3A32; --accent-dark:#34D399;
   }
   *{box-sizing:border-box;}
   body{margin:0;background:var(--page-bg);color:var(--ink);
@@ -48,7 +48,9 @@
 
   .home-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
   .avatar{width:40px;height:40px;border-radius:50%;background:var(--accent-light);color:var(--accent-dark);
-    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;}
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;overflow:hidden;}
+  .avatar svg{width:22px;height:22px;}
+  .avatar-img img{width:100%;height:100%;object-fit:cover;}
   .store-name{font-size:15px;font-weight:600;}
   .store-loc{font-size:12px;color:var(--ink-soft);}
 
@@ -64,9 +66,9 @@
     margin-bottom:10px;border:none;width:100%;text-align:left;font:inherit;}
   .role-card .icon-wrap{width:38px;height:38px;border-radius:var(--radius-sm);background:var(--paper);
     display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-  .role-card .icon-wrap .icon{width:20px;height:20px;}
-  .role-card .title{font-size:14px;font-weight:600;}
-  .role-card .sub{font-size:12px;opacity:0.85;}
+  .role-card .icon-wrap .icon{width:22px;height:22px;}
+  .role-card .title{font-size:17px;font-weight:600;}
+  .role-card .sub{font-size:14px;opacity:0.85;}
   .role-card .chev{width:18px;height:18px;margin-left:auto;flex-shrink:0;}
   .role-green{background:var(--green-light);color:var(--green-dark);}
   .role-blue{background:var(--blue-light);color:var(--blue-dark);}
@@ -149,11 +151,6 @@
   .report-row .meta{font-size:11px;color:var(--ink-soft);margin-top:2px;}
   .row-actions{display:flex;gap:2px;}
 
-  .theme-swatches{display:flex;gap:14px;flex-wrap:wrap;margin:6px 0 14px;}
-  .theme-swatch{width:42px;height:42px;border-radius:50%;border:3px solid transparent;padding:0;flex-shrink:0;}
-  .theme-swatch.selected{border-color:var(--ink);}
-  .theme-status{font-size:12px;color:var(--accent-dark);text-align:center;min-height:14px;}
-
   .note-box{background:var(--blue-light);color:var(--blue-dark);border-radius:var(--radius-md);
     padding:12px 14px;font-size:12px;line-height:1.6;margin-bottom:14px;}
   .steps-list{font-size:12px;color:var(--ink-soft);line-height:1.8;padding-left:18px;margin-bottom:16px;}
@@ -183,9 +180,9 @@
   <section class="screen active" id="screen-home">
     <div class="home-header">
       <div style="display:flex;align-items:center;gap:10px;">
-        <div class="avatar">SB</div>
+        <div class="avatar avatar-img"><img src="data:image/png;base64,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" alt="New Fancy Store logo"></div>
         <div>
-          <p class="store-name">Sri Balaji Fancy Store</p>
+          <p class="store-name">New Fancy Store</p>
           <p class="store-loc">Chittoor, S.R.Puram</p>
         </div>
       </div>
@@ -214,14 +211,14 @@
       <span>Printer settings</span>
       <span class="icon chev" data-icon="chevronRight"></span>
     </button>
-    <button class="list-row" onclick="showScreen('theme')">
-      <span class="icon" data-icon="palette"></span>
-      <span>App theme</span>
-      <span class="icon chev" data-icon="chevronRight"></span>
-    </button>
     <button class="list-row" onclick="showScreen('backup')">
       <span class="icon" data-icon="download"></span>
       <span>Data backup</span>
+      <span class="icon chev" data-icon="chevronRight"></span>
+    </button>
+    <button class="list-row" onclick="showScreen('update')">
+      <span class="icon" data-icon="refresh"></span>
+      <span>App update</span>
       <span class="icon chev" data-icon="chevronRight"></span>
     </button>
 
@@ -258,7 +255,7 @@
   <section class="screen" id="screen-receipt">
     <div class="receipt">
       <div class="receipt-center">
-        <p class="receipt-shop-name">Sri Balaji Fancy Store</p>
+        <p class="receipt-shop-name">New Fancy Store</p>
         <p class="receipt-addr">49, Kothapallimitta<br>S.R.Puram (Md)<br>Chittoor (Dist)<br>Cell: 9866086614</p>
       </div>
       <div class="divider"></div>
@@ -273,7 +270,7 @@
       <div class="receipt-row" style="grid-template-columns:1fr 1fr;font-size:15px;font-weight:700;"><span>Total</span><span style="text-align:right;" id="receipt-total">₹0.00</span></div>
       <div class="divider"></div>
       <div class="qr-wrap">
-        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjoAAAI6AQAAAAAGM99tAAAFeUlEQVR42u2dQZaiPBDHq7TnyU52s6Rv0txMvpvFI8wN9Ab0Dt9zrG8RKySILWLEyPyzolF+XQlJWVWpJCwUpWwXFKkANKDswj+XIiIiNa3shaFCRIRoIzv92N47TVu1OhYox+sHCKD3GmuXEpnbiu2swkREGlrK+ffJ3XWarxCRY3t5ImofFPQjgAACKCWLbaXGV6GK7atVWIYKaYg8i0313olIxKiZZyU6obEBAgigRBTbMVBsIobWapIZa7ypmSbtZZ9ie4c2gisKEBy/d5XIDAV9XN5iIvrmVXO+JCKiIH76ZdAhAQIIoNRBy0407UsvRSoiOrBfgset03ocoLNLNDZAAAE0HcjTW1nPNwpprIYrpNYY295+01d3aGyAAALoUdB179UF8JtBoLUE5agfHPiXKrHfIszWoPvLTLTlTyLi4DmDtwYQQAAFpY4Fyu8XqabzXOdGxM5/auaHXzS7jYg27dyCM+iIzOLuSlT9ArdVM2/9+uufQOUdoBm3EUCpgMpYIDO1RNUVUKHajPnTJq+pSUZENojWEDHb55cizBv5Y11RLzBXXpGo/lmienAb5bFef51ch8wx1gBK39DKYvXs5hborqwxtY+6D3XMtGWbq0s2n6PwM3WXnVTeL9F0kfGNfUKHBAgggKKCVDu3MTbW7LSzxbbzNdzR3qs1q9fNiva4oleW2JnB/hreGkAAAXRH8bzFnfqfG98Oq4mIvUUI/SG4/skDM2HVGrx+gGbpr0WTqHmhRBSrjUa9tYNmp+15LQd7uZZue/zHzOt20tTd/bTPlw9WrcRYAwgggKK5ojt1Ra2htWx37eBgJZXNYzuXQhqb7uFCcD0WGyfTRmUs0ABjNIslURNLomhtlMWSCHY2QM8BmRDEIsyVv32HZ7HtOSNiFtny2UR1CxM0u82BFqOtWjMXX2QEKJ+vRBhrcNenlMj7eRZ/M6JGNVdt5zq9fI6N5rHpwnjnla7s5MH1qi1+/u1fPDDWmliNPd1c9uSRCNhHACUFymIN2mjhw+dE/S7TPQ68CraFI3LWInPZKuBAvx74V5Cqgn4EEECzBZlYoHKqqqkN6aXO6TwtBROxFRXt5OyOvKDgKxUb7COAEvfX/uVIxBSNXV25vwv9XOnZIY7Udw7kHLZ6NcdYAwgggKYGtZl13taX7hQGZ5J5q1d1n19u10JgWT5AAAH0EtOvov65Bbeyq/I37V1rhokLornpDNVmp/YyPIWhfIrF9ohVa57S2ElUDd4RQDNzRZsrq1dvzIp2Jw/2nJMw2wwT5g9rkn376cEr3VFprZ4q0YHdbsD28gltNEAfpZfHFk2iV+psgAAaOUQo1hB5VCJv0rMQ0bUQ5+I2xPQ2961oy58XCSgPRP0W6EcAATQKlN4PZPnSNvL+eyfGRq268tbdn0867WbbPabY5tkhMwxagCYFNbFAWQoW2/UoyKlfourK1+WiELm1EO7cLC8bpFL3VL3SsW+tek0/yjFEAIoAqudbtTy5NsrvVyP74OwYjZzt2xhbId/2oy+p6S+z6jixTqvb0/ceYbNYig15bADN085Gz37srfWcTa9mmj/t6TmdVrF5FtsIVxT+GkDzVCMZqpZG1XqPcLY6zt9vRM+mJ8TYAAIIoHRAwx0/Znsgg7/ywEtzs15pcMLWB43NrOsRAZtyoGoAzQNUR5fIPAASEXFHmYrsyKWAHDTNbc+s5wXesNjqXokCG/I07Vh7l9GP/UYASgo03TYhQ/dj69+2KLOXlzE2PSzLXzOlPunRLkEIckTGnnRaoR8BBNA/DMpjuaJ9CnQX/rkMUtrcph79cwvqoN7YIY6IOol7lzq7hMUGEPy1NCQaYB91CkscgbbpvbX/AaMOIlPbqCe9AAAAAElFTkSuQmCC" alt="Sri Balaji Fancy Store payment QR code" style="width:130px;height:130px;display:block;margin:0 auto;image-rendering:pixelated;">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjoAAAI6AQAAAAAGM99tAAAFeUlEQVR42u2dQZaiPBDHq7TnyU52s6Rv0txMvpvFI8wN9Ab0Dt9zrG8RKySILWLEyPyzolF+XQlJWVWpJCwUpWwXFKkANKDswj+XIiIiNa3shaFCRIRoIzv92N47TVu1OhYox+sHCKD3GmuXEpnbiu2swkREGlrK+ffJ3XWarxCRY3t5ImofFPQjgAACKCWLbaXGV6GK7atVWIYKaYg8i0313olIxKiZZyU6obEBAgigRBTbMVBsIobWapIZa7ypmSbtZZ9ie4c2gisKEBy/d5XIDAV9XN5iIvrmVXO+JCKiIH76ZdAhAQIIoNRBy0407UsvRSoiOrBfgset03ocoLNLNDZAAAE0HcjTW1nPNwpprIYrpNYY295+01d3aGyAAALoUdB179UF8JtBoLUE5agfHPiXKrHfIszWoPvLTLTlTyLi4DmDtwYQQAAFpY4Fyu8XqabzXOdGxM5/auaHXzS7jYg27dyCM+iIzOLuSlT9ArdVM2/9+uufQOUdoBm3EUCpgMpYIDO1RNUVUKHajPnTJq+pSUZENojWEDHb55cizBv5Y11RLzBXXpGo/lmienAb5bFef51ch8wx1gBK39DKYvXs5hborqwxtY+6D3XMtGWbq0s2n6PwM3WXnVTeL9F0kfGNfUKHBAgggKKCVDu3MTbW7LSzxbbzNdzR3qs1q9fNiva4oleW2JnB/hreGkAAAXRH8bzFnfqfG98Oq4mIvUUI/SG4/skDM2HVGrx+gGbpr0WTqHmhRBSrjUa9tYNmp+15LQd7uZZue/zHzOt20tTd/bTPlw9WrcRYAwgggKK5ojt1Ra2htWx37eBgJZXNYzuXQhqb7uFCcD0WGyfTRmUs0ABjNIslURNLomhtlMWSCHY2QM8BmRDEIsyVv32HZ7HtOSNiFtny2UR1CxM0u82BFqOtWjMXX2QEKJ+vRBhrcNenlMj7eRZ/M6JGNVdt5zq9fI6N5rHpwnjnla7s5MH1qi1+/u1fPDDWmliNPd1c9uSRCNhHACUFymIN2mjhw+dE/S7TPQ68CraFI3LWInPZKuBAvx74V5Cqgn4EEECzBZlYoHKqqqkN6aXO6TwtBROxFRXt5OyOvKDgKxUb7COAEvfX/uVIxBSNXV25vwv9XOnZIY7Udw7kHLZ6NcdYAwgggKYGtZl13taX7hQGZ5J5q1d1n19u10JgWT5AAAH0EtOvov65Bbeyq/I37V1rhokLornpDNVmp/YyPIWhfIrF9ohVa57S2ElUDd4RQDNzRZsrq1dvzIp2Jw/2nJMw2wwT5g9rkn376cEr3VFprZ4q0YHdbsD28gltNEAfpZfHFk2iV+psgAAaOUQo1hB5VCJv0rMQ0bUQ5+I2xPQ2961oy58XCSgPRP0W6EcAATQKlN4PZPnSNvL+eyfGRq268tbdn0867WbbPabY5tkhMwxagCYFNbFAWQoW2/UoyKlfourK1+WiELm1EO7cLC8bpFL3VL3SsW+tek0/yjFEAIoAqudbtTy5NsrvVyP74OwYjZzt2xhbId/2oy+p6S+z6jixTqvb0/ceYbNYig15bADN085Gz37srfWcTa9mmj/t6TmdVrF5FtsIVxT+GkDzVCMZqpZG1XqPcLY6zt9vRM+mJ8TYAAIIoHRAwx0/Znsgg7/ywEtzs15pcMLWB43NrOsRAZtyoGoAzQNUR5fIPAASEXFHmYrsyKWAHDTNbc+s5wXesNjqXokCG/I07Vh7l9GP/UYASgo03TYhQ/dj69+2KLOXlzE2PSzLXzOlPunRLkEIckTGnnRaoR8BBNA/DMpjuaJ9CnQX/rkMUtrcph79cwvqoN7YIY6IOol7lzq7hMUGEPy1NCQaYB91CkscgbbpvbX/AaMOIlPbqCe9AAAAAElFTkSuQmCC" alt="New Fancy Store payment QR code" style="width:130px;height:130px;display:block;margin:0 auto;image-rendering:pixelated;">
         <p style="font-size:11px;color:var(--ink-soft);margin-top:6px;" id="receipt-qr-label">Scan & pay ₹0.00</p>
         <p style="font-size:10px;color:var(--ink-faint);margin-top:2px;">UPI ID: paytmqr5ftk5t@ptys</p>
       </div>
@@ -330,12 +327,6 @@
     <button class="btn btn-outline" id="test-print-btn"><span class="icon" data-icon="printer"></span>Test print</button>
   </section>
 
-  <section class="screen" id="screen-theme">
-    <p class="section-label" style="margin-top:0;">Pick an app color</p>
-    <div class="theme-swatches" id="theme-swatches"></div>
-    <p class="theme-status" id="theme-status"></p>
-  </section>
-
   <section class="screen" id="screen-backup">
     <div class="note-box">A backup file downloads automatically once a day when you open this app. Save it to Google Drive, WhatsApp it to yourself, or keep it on your computer — so your bills and stock are never lost, even if you clear browser data or switch phones.</div>
 
@@ -346,6 +337,12 @@
     <input type="file" id="restore-file-in" accept="application/json" style="margin-bottom:10px;">
     <button class="btn btn-primary" id="restore-btn">Restore</button>
     <p class="printer-status" id="restore-status"></p>
+  </section>
+
+  <section class="screen" id="screen-update">
+    <div class="note-box">This app remembers files on your phone so it opens fast and works offline. That means after an update is made, your phone may keep showing the old version until you ask it to fetch the new one. Tap the button below any time after an update — it clears the saved files and reloads the latest version.</div>
+    <button class="btn btn-primary" id="app-update-btn"><span class="icon" data-icon="refresh"></span>Update app now</button>
+    <p class="printer-status" id="update-status"></p>
   </section>
 
   <nav class="bottom-nav" id="bottom-nav">
@@ -372,7 +369,8 @@ const ICONS = {
   pencil: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>',
   trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>',
   palette: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="0.6" fill="currentColor"/><circle cx="17.5" cy="10.5" r="0.6" fill="currentColor"/><circle cx="8.5" cy="7.5" r="0.6" fill="currentColor"/><circle cx="6.5" cy="12.5" r="0.6" fill="currentColor"/><path d="M12 2a10 10 0 1 0 0 20c1 0 2-1 2-2s-1-1-1-2 1-1 2-1h2a4 4 0 0 0 4-4c0-5.5-4.5-11-9-11z"/></svg>',
-  download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>'
+  download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>',
+  refresh: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7M21 12a9 9 0 0 1-15 6.7"/><path d="M16 3v5h-5M8 21v-5h5"/></svg>'
 };
 document.querySelectorAll('[data-icon]').forEach(el => { el.innerHTML = ICONS[el.dataset.icon] || ''; });
 
@@ -391,22 +389,21 @@ function refreshCatalogDatalist(){
   names.forEach(n=>{ const opt=document.createElement('option'); opt.value=n; catalogEl.appendChild(opt); });
 }
 
-const screens = ['home','billing','receipt','inventory','reports','printer','theme','backup'];
+const screens = ['home','billing','receipt','inventory','reports','printer','backup','update'];
 const topbar = document.getElementById('topbar');
 const topbarTitle = document.getElementById('topbar-title');
 const bottomNav = document.getElementById('bottom-nav');
-const titles = { billing:'Billing', receipt:'Receipt', inventory:'Inventory', reports:'Reports', printer:'Printer settings', theme:'App theme', backup:'Data backup' };
+const titles = { billing:'Billing', receipt:'Receipt', inventory:'Inventory', reports:'Reports', printer:'Printer settings', backup:'Data backup', update:'App update' };
 
 function showScreen(name){
   screens.forEach(s => document.getElementById('screen-'+s).classList.toggle('active', s===name));
   if(name==='home'){ topbar.classList.add('hidden'); }
   else { topbar.classList.remove('hidden'); topbarTitle.textContent = titles[name] || ''; }
   bottomNav.querySelectorAll('button').forEach(b=>{
-    const navTarget = (name==='receipt') ? 'billing' : ((name==='reports' || name==='printer' || name==='theme' || name==='backup') ? 'home' : name);
+    const navTarget = (name==='receipt') ? 'billing' : ((name==='reports' || name==='printer' || name==='backup' || name==='update') ? 'home' : name);
     b.classList.toggle('active', b.dataset.screen===navTarget);
   });
   if(name==='reports') renderReports();
-  if(name==='theme') renderThemeSwatches();
   window.scrollTo(0,0);
 }
 document.getElementById('back-btn').addEventListener('click', ()=>showScreen('home'));
@@ -645,53 +642,6 @@ document.getElementById('inv-add-btn').addEventListener('click', ()=>{
   refreshCatalogDatalist();
 });
 
-const THEMES = {
-  green:    { bg:'#EDEBE3', paper:'#FFFFFF', ink:'#1F2421', inkSoft:'#5B6058', inkFaint:'#8B9089', line:'#E3E0D6',
-              accent:'#1F7A4D', accentLight:'#E6F4EC', accentDark:'#155C3A', label:'Fresh Green' },
-  blue:     { bg:'#E9EEF5', paper:'#FFFFFF', ink:'#1B2330', inkSoft:'#5C6878', inkFaint:'#94A0AC', line:'#DCE3EC',
-              accent:'#1D6FCB', accentLight:'#E7F0FC', accentDark:'#14508F', label:'Ocean Blue' },
-  purple:   { bg:'#EFEAF6', paper:'#FFFFFF', ink:'#241B33', inkSoft:'#6B5E80', inkFaint:'#A293B8', line:'#E2D9ED',
-              accent:'#6B3FA0', accentLight:'#F1EAFA', accentDark:'#4D2D75', label:'Royal Purple' },
-  orange:   { bg:'#F6ECE3', paper:'#FFFFFF', ink:'#2E2016', inkSoft:'#7A6450', inkFaint:'#B49A85', line:'#EBDCC9',
-              accent:'#C2622A', accentLight:'#FBEEE3', accentDark:'#8F4720', label:'Sunset Orange' },
-  maroon:   { bg:'#F5E9EA', paper:'#FFFFFF', ink:'#2E1318', inkSoft:'#7D5258', inkFaint:'#B68A8E', line:'#EBDADC',
-              accent:'#9B2C3A', accentLight:'#FBE9EC', accentDark:'#6E1F2A', label:'Maroon' },
-  midnight: { bg:'#11151A', paper:'#1B2027', ink:'#EDEFF2', inkSoft:'#9AA3AE', inkFaint:'#5E6772', line:'#2B323B',
-              accent:'#259969', accentLight:'#1F3A32', accentDark:'#34D399', label:'Midnight' }
-};
-
-function applyTheme(key){
-  const t = THEMES[key] || THEMES.green;
-  const root = document.documentElement.style;
-  root.setProperty('--page-bg', t.bg);
-  root.setProperty('--paper', t.paper);
-  root.setProperty('--ink', t.ink);
-  root.setProperty('--ink-soft', t.inkSoft);
-  root.setProperty('--ink-faint', t.inkFaint);
-  root.setProperty('--line', t.line);
-  root.setProperty('--accent', t.accent);
-  root.setProperty('--accent-light', t.accentLight);
-  root.setProperty('--accent-dark', t.accentDark);
-  store.set('theme', key);
-  renderThemeSwatches();
-}
-
-function renderThemeSwatches(){
-  const wrap = document.getElementById('theme-swatches');
-  const current = store.get('theme','green');
-  wrap.innerHTML = Object.keys(THEMES).map(key=>{
-    const t = THEMES[key];
-    const sel = key===current ? ' selected' : '';
-    return '<button type="button" class="theme-swatch'+sel+'" data-key="'+key+'" style="background:'+t.accent+'" aria-label="'+t.label+'"></button>';
-  }).join('');
-  wrap.querySelectorAll('.theme-swatch').forEach(b=>b.addEventListener('click', ()=>{
-    applyTheme(b.dataset.key);
-    document.getElementById('theme-status').textContent = THEMES[b.dataset.key].label+' applied';
-    setTimeout(()=>{ document.getElementById('theme-status').textContent=''; }, 1200);
-  }));
-}
-applyTheme(store.get('theme','green'));
-
 const printerNameIn = document.getElementById('printer-name-in');
 const printerStatus = document.getElementById('printer-status');
 printerNameIn.value = store.get('printerName','');
@@ -714,7 +664,6 @@ function buildBackupData(){
     catalog: store.get('catalog', []),
     billCounter: store.get('billCounter', 1),
     printerName: store.get('printerName',''),
-    theme: store.get('theme','green'),
     exportedAt: new Date().toISOString()
   };
 }
@@ -725,7 +674,7 @@ function downloadBackup(){
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'sbf_store_backup_'+todayStr()+'.json';
+  a.download = 'new_fancy_store_backup_'+todayStr()+'.json';
   document.body.appendChild(a);
   a.click();
   a.remove();
@@ -754,7 +703,6 @@ document.getElementById('restore-btn').addEventListener('click', ()=>{
       if(data.catalog) store.set('catalog', data.catalog);
       if(data.billCounter) store.set('billCounter', data.billCounter);
       if(data.printerName!=null) store.set('printerName', data.printerName);
-      if(data.theme) store.set('theme', data.theme);
       restoreStatus.textContent = 'Restored — reloading...';
       setTimeout(()=>location.reload(), 900);
     } catch(err){
@@ -768,6 +716,22 @@ document.getElementById('restore-btn').addEventListener('click', ()=>{
 if(store.get('lastBackupDate','') !== todayStr() && bills.length+inventory.length > 0){
   setTimeout(()=>{ try{ downloadBackup(); } catch(e){} }, 1500);
 }
+
+const updateStatus = document.getElementById('update-status');
+document.getElementById('app-update-btn').addEventListener('click', async ()=>{
+  updateStatus.textContent = 'Updating...';
+  try{
+    if('serviceWorker' in navigator){
+      const regs = await navigator.serviceWorker.getRegistrations();
+      for(const reg of regs){ await reg.unregister(); }
+    }
+    if('caches' in window){
+      const keys = await caches.keys();
+      for(const key of keys){ await caches.delete(key); }
+    }
+  } catch(e){ /* continue anyway */ }
+  location.reload();
+});
 
 document.getElementById('print-btn').addEventListener('click', ()=>window.print());
 document.getElementById('new-bill-btn').addEventListener('click', ()=>startNewBill());

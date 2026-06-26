@@ -1,4 +1,4 @@
-# Sri Balaji Fancy Store — PWA package
+# New Fancy Store — PWA package
 
 ## GitHub Pages లో పెట్టడం (deploy)
 
