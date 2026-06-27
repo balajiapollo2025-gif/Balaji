@@ -446,7 +446,7 @@ const BLE_OPTIONAL_SERVICES = [
   '6e400001-b5a3-f393-e0a9-e50e24dcca9e'
 ];
 
-function buildReceiptText(bill){
+function buildReceiptTextPart1(bill){
   const W = 32;
   const center = (s)=>{ s=String(s); const pad=Math.max(0,Math.floor((W-s.length)/2)); return ' '.repeat(pad)+s; };
   const line = (ch)=> ch.repeat(W);
@@ -470,9 +470,42 @@ function buildReceiptText(bill){
   t += line('-')+'\n';
   t += row('TOTAL', fmt(bill.grandTotal))+'\n';
   t += line('-')+'\n';
-  if(bill.remarks) t += 'Note: '+bill.remarks+'\n';
-  t += center('Thank you! Visit again')+'\n\n\n\n';
   return t;
+}
+
+function buildReceiptTextPart2(bill){
+  const W = 32;
+  const center = (s)=>{ s=String(s); const pad=Math.max(0,Math.floor((W-s.length)/2)); return ' '.repeat(pad)+s; };
+  let t = '';
+  t += center('Scan & pay '+fmt(bill.grandTotal))+'\n';
+  t += center('UPI: paytmqr5ftk5t@ptys')+'\n';
+  t += '-'.repeat(W)+'\n';
+  if(bill.remarks) t += 'Note: '+bill.remarks+'\n';
+  t += center('Thank you! Visit again')+'\n\n\n\n\n\n';
+  return t;
+}
+
+function buildUPIString(bill){
+  const params = new URLSearchParams({
+    pa: 'paytmqr5ftk5t@ptys',
+    pn: 'New Fancy Store',
+    am: bill.grandTotal.toFixed(2),
+    cu: 'INR'
+  });
+  return 'upi://pay?' + params.toString();
+}
+
+function buildQRBytes(data, size, ec){
+  const enc = new TextEncoder().encode(data);
+  const out = [];
+  out.push(0x1D,0x28,0x6B,0x04,0x00,0x31,0x41,0x32,0x00); // model 2
+  out.push(0x1D,0x28,0x6B,0x03,0x00,0x31,0x43,size);       // module size
+  out.push(0x1D,0x28,0x6B,0x03,0x00,0x31,0x45,ec);         // error correction
+  const len = enc.length + 3;
+  out.push(0x1D,0x28,0x6B, len & 0xFF, (len>>8)&0xFF, 0x31,0x50,0x30);
+  for(const b of enc) out.push(b);
+  out.push(0x1D,0x28,0x6B,0x03,0x00,0x31,0x51,0x30);       // print
+  return new Uint8Array(out);
 }
 
 async function writeInChunks(characteristic, bytes){
@@ -487,13 +520,25 @@ async function writeInChunks(characteristic, bytes){
 
 async function printViaBLE(bill){
   if(!bleCharacteristic) return false;
-  const text = buildReceiptText(bill);
-  const encoder = new TextEncoder();
-  const init = new Uint8Array([0x1B,0x40]);
-  const bodyBytes = encoder.encode(text);
-  const bytes = new Uint8Array(init.length + bodyBytes.length);
-  bytes.set(init,0); bytes.set(bodyBytes, init.length);
-  await writeInChunks(bleCharacteristic, bytes);
+  const enc = new TextEncoder();
+  const ESC_INIT = [0x1B,0x40];
+  const ALIGN_CENTER = [0x1B,0x61,0x01];
+  const ALIGN_LEFT = [0x1B,0x61,0x00];
+  const FEED_4 = [0x1B,0x64,0x04];
+  const CUT = [0x1D,0x56,0x00];
+
+  const part1 = Array.from(enc.encode(buildReceiptTextPart1(bill)));
+  const part2 = Array.from(enc.encode(buildReceiptTextPart2(bill)));
+  const qrBytes = Array.from(buildQRBytes(buildUPIString(bill), 6, 49));
+
+  const all = [
+    ...ESC_INIT,
+    ...ALIGN_LEFT, ...part1,
+    ...ALIGN_CENTER, ...qrBytes,
+    ...part2,
+    ...FEED_4, ...CUT
+  ];
+  await writeInChunks(bleCharacteristic, new Uint8Array(all));
   return true;
 }
 
