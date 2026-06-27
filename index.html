@@ -313,10 +313,20 @@
       <li>Open this app, tap "Print receipt", choose RawBT at "Select printer" — it'll remember this every time</li>
     </ol>
 
-    <p class="section-label">Printer name (for your reference)</p>
-    <input type="text" id="printer-name-in" placeholder="e.g. RPP02, MPT-II 80mm">
+    <p class="section-label">Printer Bluetooth name (optional)</p>
+    <input type="text" id="printer-name-in" placeholder="e.g. Printer001, RPP02">
     <button class="btn btn-primary" id="printer-save-btn" style="margin-top:10px;">Save</button>
     <p class="printer-status" id="printer-status"></p>
+    <p style="font-size:12px;color:var(--ink-soft);margin:6px 0 0;">If you know your printer's Bluetooth name, enter it here — the picker below will show only that device.</p>
+
+    <button class="btn btn-outline" id="ble-connect-btn" style="margin-top:16px;"><span class="icon" data-icon="refresh"></span>Try direct Bluetooth connect (experimental)</button>
+    <p class="printer-status" id="ble-status"></p>
+
+    <label style="display:flex;align-items:flex-start;gap:10px;margin-top:14px;font-size:13px;">
+      <input type="checkbox" id="ble-direct-toggle" style="width:auto;margin-top:3px;">
+      <span>Use this Bluetooth printer directly (skip the system print dialog)</span>
+    </label>
+    <p style="font-size:12px;color:var(--ink-soft);margin:8px 0 0;">This only works with printers that support Bluetooth Low Energy. Most low-cost thermal printers use Classic Bluetooth and need the RawBT method below instead — if direct connect fails, that's expected, just use RawBT.</p>
 
     <p class="section-label">Not printing? Check these</p>
     <ol class="steps-list">
@@ -424,6 +434,108 @@ const catalog = document.getElementById('catalog');
 let billCounter = store.get('billCounter', 1);
 let bills = store.get('bills', []);
 let editingBillIndex = null;
+let bleDevice = null;
+let bleCharacteristic = null;
+let currentReceiptBill = null;
+
+const BLE_OPTIONAL_SERVICES = [
+  '000018f0-0000-1000-8000-00805f9b34fb',
+  '0000ff00-0000-1000-8000-00805f9b34fb',
+  '0000ffe0-0000-1000-8000-00805f9b34fb',
+  '49535343-fe7d-4ae5-8fa9-9fafd205e455',
+  '6e400001-b5a3-f393-e0a9-e50e24dcca9e'
+];
+
+function buildReceiptText(bill){
+  const W = 32;
+  const center = (s)=>{ s=String(s); const pad=Math.max(0,Math.floor((W-s.length)/2)); return ' '.repeat(pad)+s; };
+  const line = (ch)=> ch.repeat(W);
+  const row = (l,r)=>{ l=String(l); r=String(r); const sp=Math.max(1,W-l.length-r.length); return l+' '.repeat(sp)+r; };
+  let t = '';
+  t += center('New Fancy Store')+'\n';
+  t += center('49, Kothapallimitta')+'\n';
+  t += center('S.R.Puram (Md)')+'\n';
+  t += center('Chittoor (Dist)')+'\n';
+  t += center('Cell: 9866086614')+'\n';
+  t += line('-')+'\n';
+  t += 'Bill no: '+bill.billNo+'\n'+bill.date+'\n';
+  t += line('-')+'\n';
+  bill.items.forEach(it=>{
+    t += it.name+'\n';
+    t += row('  '+it.qty+' x '+it.price.toFixed(2), it.total.toFixed(2))+'\n';
+  });
+  t += line('-')+'\n';
+  t += row('Subtotal', bill.subtotal.toFixed(2))+'\n';
+  t += row('Discount ('+bill.discountPct+'%)', '-'+bill.discountAmt.toFixed(2))+'\n';
+  t += line('-')+'\n';
+  t += row('TOTAL', fmt(bill.grandTotal))+'\n';
+  t += line('-')+'\n';
+  if(bill.remarks) t += 'Note: '+bill.remarks+'\n';
+  t += center('Thank you! Visit again')+'\n\n\n\n';
+  return t;
+}
+
+async function writeInChunks(characteristic, bytes){
+  const CHUNK = 100;
+  for(let i=0; i<bytes.length; i+=CHUNK){
+    const chunk = bytes.slice(i, i+CHUNK);
+    try{ await characteristic.writeValueWithoutResponse(chunk); }
+    catch(e){ await characteristic.writeValue(chunk); }
+    await new Promise(r=>setTimeout(r, 30));
+  }
+}
+
+async function printViaBLE(bill){
+  if(!bleCharacteristic) return false;
+  const text = buildReceiptText(bill);
+  const encoder = new TextEncoder();
+  const init = new Uint8Array([0x1B,0x40]);
+  const bodyBytes = encoder.encode(text);
+  const bytes = new Uint8Array(init.length + bodyBytes.length);
+  bytes.set(init,0); bytes.set(bodyBytes, init.length);
+  await writeInChunks(bleCharacteristic, bytes);
+  return true;
+}
+
+async function connectBLEPrinter(){
+  const bleStatus = document.getElementById('ble-status');
+  if(!navigator.bluetooth){
+    bleStatus.textContent = 'Bluetooth not supported in this browser. Use Chrome on Android.';
+    return;
+  }
+  const nameFilter = document.getElementById('printer-name-in').value.trim();
+  const options = { optionalServices: BLE_OPTIONAL_SERVICES };
+  if(nameFilter){ options.filters = [{ namePrefix: nameFilter }]; }
+  else { options.acceptAllDevices = true; }
+  try{
+    bleStatus.textContent = 'Choose your printer...';
+    const device = await navigator.bluetooth.requestDevice(options);
+    bleStatus.textContent = 'Connecting...';
+    const server = await device.gatt.connect();
+    const services = await server.getPrimaryServices();
+    let foundChar = null;
+    for(const service of services){
+      const chars = await service.getCharacteristics();
+      for(const ch of chars){
+        if(ch.properties.write || ch.properties.writeWithoutResponse){ foundChar = ch; break; }
+      }
+      if(foundChar) break;
+    }
+    if(!foundChar){
+      bleStatus.textContent = 'Connected, but no writable channel found on this printer.';
+      return;
+    }
+    bleDevice = device;
+    bleCharacteristic = foundChar;
+    bleStatus.textContent = '✅ Connected: '+(device.name || nameFilter || 'printer');
+    device.addEventListener('gattserverdisconnected', ()=>{
+      bleCharacteristic = null;
+      bleStatus.textContent = 'Disconnected — tap "Try direct Bluetooth connect" again.';
+    });
+  } catch(e){
+    bleStatus.textContent = 'Could not connect (cancelled, or this printer uses Classic Bluetooth — use RawBT below instead).';
+  }
+}
 
 function fmt(n){ return '₹' + n.toFixed(2); }
 
@@ -478,6 +590,7 @@ function formatDate(d){
 }
 
 function populateReceipt(bill){
+  currentReceiptBill = bill;
   document.getElementById('receipt-billno').textContent='Bill no: '+bill.billNo;
   document.getElementById('receipt-date').textContent=bill.date;
   document.getElementById('receipt-items').innerHTML = bill.items.map(it=>
@@ -649,6 +762,11 @@ document.getElementById('inv-add-btn').addEventListener('click', ()=>{
 const printerNameIn = document.getElementById('printer-name-in');
 const printerStatus = document.getElementById('printer-status');
 printerNameIn.value = store.get('printerName','');
+document.getElementById('ble-direct-toggle').checked = store.get('useDirectBLE', false);
+document.getElementById('ble-direct-toggle').addEventListener('change', (e)=>{
+  store.set('useDirectBLE', e.target.checked);
+});
+document.getElementById('ble-connect-btn').addEventListener('click', connectBLEPrinter);
 document.getElementById('printer-save-btn').addEventListener('click', ()=>{
   store.set('printerName', printerNameIn.value.trim());
   printerStatus.textContent='Saved';
@@ -737,7 +855,18 @@ document.getElementById('app-update-btn').addEventListener('click', async ()=>{
   location.reload();
 });
 
-document.getElementById('print-btn').addEventListener('click', ()=>window.print());
+document.getElementById('print-btn').addEventListener('click', async ()=>{
+  const useDirect = document.getElementById('ble-direct-toggle').checked;
+  if(useDirect && bleCharacteristic && currentReceiptBill){
+    try{
+      await printViaBLE(currentReceiptBill);
+      return;
+    } catch(e){
+      // fall through to system print dialog if direct printing fails
+    }
+  }
+  window.print();
+});
 document.getElementById('new-bill-btn').addEventListener('click', ()=>startNewBill());
 
 const shareStatus = document.getElementById('share-status');
