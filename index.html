@@ -115,7 +115,7 @@
   .grand-row .value{font-size:18px;font-weight:700;}
   .error-msg{color:var(--red);font-size:12px;text-align:center;min-height:16px;margin-top:6px;}
 
-  .receipt{font-family:"Courier New",monospace;background:var(--paper);border:1px solid var(--line);
+  .receipt{font-family:"Courier New",monospace;background:var(--paper);border:2px solid var(--ink);
     border-radius:var(--radius-md);padding:18px 16px;max-width:300px;margin:0 auto;}
   .receipt-center{text-align:center;}
   .receipt-shop-name{font-size:15px;font-weight:700;margin-bottom:4px;}
@@ -158,12 +158,15 @@
 
   @media print{
     body{background:#fff;}
-    .phone{box-shadow:none;border-radius:0;width:80mm;margin:0;background:#fff !important;}
+    .phone{box-shadow:none;border-radius:0;width:80mm;margin:0 auto;background:#fff !important;}
     .topbar,.bottom-nav,.no-print{display:none !important;}
     #screen-home,#screen-billing,#screen-inventory,#screen-reports{display:none !important;}
     #screen-receipt{display:block !important;padding:0;background:#fff !important;}
     #screen-receipt .receipt,#screen-receipt .receipt *{
       background:#fff !important;color:#000 !important;border-color:#999 !important;
+    }
+    #screen-receipt .receipt{
+      border:2px solid #000 !important;
     }
     @page{size:80mm auto;margin:4mm;}
   }
@@ -224,7 +227,7 @@
 
     <p class="section-label" style="margin-top:18px;">Today's overview</p>
     <div class="stats-grid">
-      <div class="stat-card stat-green"><p class="label">Revenue</p><p class="value">₹48,250</p></div>
+      <div class="stat-card stat-green"><p class="label">Revenue</p><p class="value">Rs.48,250</p></div>
       <div class="stat-card stat-blue"><p class="label">Bills today</p><p class="value">42</p></div>
       <div class="stat-card stat-red"><p class="label">Low stock</p><p class="value">7 items</p></div>
     </div>
@@ -240,9 +243,9 @@
     <button class="btn btn-outline" id="add-row" style="margin-bottom:14px;"><span class="icon" data-icon="plus"></span>Add product</button>
 
     <div class="totals-card">
-      <div class="totals-row"><span>Subtotal</span><span id="subtotal">₹0.00</span></div>
+      <div class="totals-row"><span>Subtotal</span><span id="subtotal">Rs.0.00</span></div>
       <div class="totals-row"><span>Discount %</span><input type="number" id="discount-in" value="0" min="0" max="100" step="1"></div>
-      <div class="grand-row"><span class="label">Grand total</span><span class="value" id="grand-total">₹0.00</span></div>
+      <div class="grand-row"><span class="label">Grand total</span><span class="value" id="grand-total">Rs.0.00</span></div>
     </div>
 
     <p class="section-label" style="margin-top:4px;">Remarks (optional)</p>
@@ -267,12 +270,12 @@
       <div class="receipt-row" style="grid-template-columns:1fr 1fr;"><span>Subtotal</span><span style="text-align:right;" id="receipt-subtotal">0.00</span></div>
       <div class="receipt-row" style="grid-template-columns:1fr 1fr;color:var(--ink-soft);"><span id="receipt-discount-label">Discount</span><span style="text-align:right;" id="receipt-discount">0.00</span></div>
       <div class="divider"></div>
-      <div class="receipt-row" style="grid-template-columns:1fr 1fr;font-size:15px;font-weight:700;"><span>Total</span><span style="text-align:right;" id="receipt-total">₹0.00</span></div>
+      <div class="receipt-row" style="grid-template-columns:1fr 1fr;font-size:15px;font-weight:700;"><span>Total</span><span style="text-align:right;" id="receipt-total">Rs.0.00</span></div>
       <div class="divider"></div>
       <div class="qr-wrap">
-        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjoAAAI6AQAAAAAGM99tAAAFeUlEQVR42u2dQZaiPBDHq7TnyU52s6Rv0txMvpvFI8wN9Ab0Dt9zrG8RKySILWLEyPyzolF+XQlJWVWpJCwUpWwXFKkANKDswj+XIiIiNa3shaFCRIRoIzv92N47TVu1OhYox+sHCKD3GmuXEpnbiu2swkREGlrK+ffJ3XWarxCRY3t5ImofFPQjgAACKCWLbaXGV6GK7atVWIYKaYg8i0313olIxKiZZyU6obEBAgigRBTbMVBsIobWapIZa7ypmSbtZZ9ie4c2gisKEBy/d5XIDAV9XN5iIvrmVXO+JCKiIH76ZdAhAQIIoNRBy0407UsvRSoiOrBfgset03ocoLNLNDZAAAE0HcjTW1nPNwpprIYrpNYY295+01d3aGyAAALoUdB179UF8JtBoLUE5agfHPiXKrHfIszWoPvLTLTlTyLi4DmDtwYQQAAFpY4Fyu8XqabzXOdGxM5/auaHXzS7jYg27dyCM+iIzOLuSlT9ArdVM2/9+uufQOUdoBm3EUCpgMpYIDO1RNUVUKHajPnTJq+pSUZENojWEDHb55cizBv5Y11RLzBXXpGo/lmienAb5bFef51ch8wx1gBK39DKYvXs5hborqwxtY+6D3XMtGWbq0s2n6PwM3WXnVTeL9F0kfGNfUKHBAgggKKCVDu3MTbW7LSzxbbzNdzR3qs1q9fNiva4oleW2JnB/hreGkAAAXRH8bzFnfqfG98Oq4mIvUUI/SG4/skDM2HVGrx+gGbpr0WTqHmhRBSrjUa9tYNmp+15LQd7uZZue/zHzOt20tTd/bTPlw9WrcRYAwgggKK5ojt1Ra2htWx37eBgJZXNYzuXQhqb7uFCcD0WGyfTRmUs0ABjNIslURNLomhtlMWSCHY2QM8BmRDEIsyVv32HZ7HtOSNiFtny2UR1CxM0u82BFqOtWjMXX2QEKJ+vRBhrcNenlMj7eRZ/M6JGNVdt5zq9fI6N5rHpwnjnla7s5MH1qi1+/u1fPDDWmliNPd1c9uSRCNhHACUFymIN2mjhw+dE/S7TPQ68CraFI3LWInPZKuBAvx74V5Cqgn4EEECzBZlYoHKqqqkN6aXO6TwtBROxFRXt5OyOvKDgKxUb7COAEvfX/uVIxBSNXV25vwv9XOnZIY7Udw7kHLZ6NcdYAwgggKYGtZl13taX7hQGZ5J5q1d1n19u10JgWT5AAAH0EtOvov65Bbeyq/I37V1rhokLornpDNVmp/YyPIWhfIrF9ohVa57S2ElUDd4RQDNzRZsrq1dvzIp2Jw/2nJMw2wwT5g9rkn376cEr3VFprZ4q0YHdbsD28gltNEAfpZfHFk2iV+psgAAaOUQo1hB5VCJv0rMQ0bUQ5+I2xPQ2961oy58XCSgPRP0W6EcAATQKlN4PZPnSNvL+eyfGRq268tbdn0867WbbPabY5tkhMwxagCYFNbFAWQoW2/UoyKlfourK1+WiELm1EO7cLC8bpFL3VL3SsW+tek0/yjFEAIoAqudbtTy5NsrvVyP74OwYjZzt2xhbId/2oy+p6S+z6jixTqvb0/ceYbNYig15bADN085Gz37srfWcTa9mmj/t6TmdVrF5FtsIVxT+GkDzVCMZqpZG1XqPcLY6zt9vRM+mJ8TYAAIIoHRAwx0/Znsgg7/ywEtzs15pcMLWB43NrOsRAZtyoGoAzQNUR5fIPAASEXFHmYrsyKWAHDTNbc+s5wXesNjqXokCG/I07Vh7l9GP/UYASgo03TYhQ/dj69+2KLOXlzE2PSzLXzOlPunRLkEIckTGnnRaoR8BBNA/DMpjuaJ9CnQX/rkMUtrcph79cwvqoN7YIY6IOol7lzq7hMUGEPy1NCQaYB91CkscgbbpvbX/AaMOIlPbqCe9AAAAAElFTkSuQmCC" alt="New Fancy Store payment QR code" style="width:130px;height:130px;display:block;margin:0 auto;image-rendering:pixelated;">
-        <p style="font-size:11px;color:var(--ink-soft);margin-top:6px;" id="receipt-qr-label">Scan & pay ₹0.00</p>
-        <p style="font-size:10px;color:var(--ink-faint);margin-top:2px;">UPI ID: paytmqr5ftk5t@ptys</p>
+        <p id="receipt-scanpay-label" style="font-size:14px;color:var(--ink);font-weight:600;margin-bottom:8px;">Scan & Pay Rs.0.00</p>
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjoAAAI6AQAAAAAGM99tAAAFeUlEQVR42u2dQZaiPBDHq7TnyU52s6Rv0txMvpvFI8wN9Ab0Dt9zrG8RKySILWLEyPyzolF+XQlJWVWpJCwUpWwXFKkANKDswj+XIiIiNa3shaFCRIRoIzv92N47TVu1OhYox+sHCKD3GmuXEpnbiu2swkREGlrK+ffJ3XWarxCRY3t5ImofFPQjgAACKCWLbaXGV6GK7atVWIYKaYg8i0313olIxKiZZyU6obEBAgigRBTbMVBsIobWapIZa7ypmSbtZZ9ie4c2gisKEBy/d5XIDAV9XN5iIvrmVXO+JCKiIH76ZdAhAQIIoNRBy0407UsvRSoiOrBfgset03ocoLNLNDZAAAE0HcjTW1nPNwpprIYrpNYY295+01d3aGyAAALoUdB179UF8JtBoLUE5agfHPiXKrHfIszWoPvLTLTlTyLi4DmDtwYQQAAFpY4Fyu8XqabzXOdGxM5/auaHXzS7jYg27dyCM+iIzOLuSlT9ArdVM2/9+uufQOUdoBm3EUCpgMpYIDO1RNUVUKHajPnTJq+pSUZENojWEDHb55cizBv5Y11RLzBXXpGo/lmienAb5bFef51ch8wx1gBK39DKYvXs5hborqwxtY+6D3XMtGWbq0s2n6PwM3WXnVTeL9F0kfGNfUKHBAgggKKCVDu3MTbW7LSzxbbzNdzR3qs1q9fNiva4oleW2JnB/hreGkAAAXRH8bzFnfqfG98Oq4mIvUUI/SG4/skDM2HVGrx+gGbpr0WTqHmhRBSrjUa9tYNmp+15LQd7uZZue/zHzOt20tTd/bTPlw9WrcRYAwgggKK5ojt1Ra2htWx37eBgJZXNYzuXQhqb7uFCcD0WGyfTRmUs0ABjNIslURNLomhtlMWSCHY2QM8BmRDEIsyVv32HZ7HtOSNiFtny2UR1CxM0u82BFqOtWjMXX2QEKJ+vRBhrcNenlMj7eRZ/M6JGNVdt5zq9fI6N5rHpwnjnla7s5MH1qi1+/u1fPDDWmliNPd1c9uSRCNhHACUFymIN2mjhw+dE/S7TPQ68CraFI3LWInPZKuBAvx74V5Cqgn4EEECzBZlYoHKqqqkN6aXO6TwtBROxFRXt5OyOvKDgKxUb7COAEvfX/uVIxBSNXV25vwv9XOnZIY7Udw7kHLZ6NcdYAwgggKYGtZl13taX7hQGZ5J5q1d1n19u10JgWT5AAAH0EtOvov65Bbeyq/I37V1rhokLornpDNVmp/YyPIWhfIrF9ohVa57S2ElUDd4RQDNzRZsrq1dvzIp2Jw/2nJMw2wwT5g9rkn376cEr3VFprZ4q0YHdbsD28gltNEAfpZfHFk2iV+psgAAaOUQo1hB5VCJv0rMQ0bUQ5+I2xPQ2961oy58XCSgPRP0W6EcAATQKlN4PZPnSNvL+eyfGRq268tbdn0867WbbPabY5tkhMwxagCYFNbFAWQoW2/UoyKlfourK1+WiELm1EO7cLC8bpFL3VL3SsW+tek0/yjFEAIoAqudbtTy5NsrvVyP74OwYjZzt2xhbId/2oy+p6S+z6jixTqvb0/ceYbNYig15bADN085Gz37srfWcTa9mmj/t6TmdVrF5FtsIVxT+GkDzVCMZqpZG1XqPcLY6zt9vRM+mJ8TYAAIIoHRAwx0/Znsgg7/ywEtzs15pcMLWB43NrOsRAZtyoGoAzQNUR5fIPAASEXFHmYrsyKWAHDTNbc+s5wXesNjqXokCG/I07Vh7l9GP/UYASgo03TYhQ/dj69+2KLOXlzE2PSzLXzOlPunRLkEIckTGnnRaoR8BBNA/DMpjuaJ9CnQX/rkMUtrcph79cwvqoN7YIY6IOol7lzq7hMUGEPy1NCQaYB91CkscgbbpvbX/AaMOIlPbqCe9AAAAAElFTkSuQmCC" alt="New Fancy Store payment QR code" style="width:150px;height:150px;display:block;margin:0 auto;image-rendering:pixelated;">
+        <p style="font-size:13px;color:var(--ink);font-weight:600;margin-top:14px;">UPI ID: paytmqr5ftk5t@ptys</p>
       </div>
       <p id="receipt-remarks" style="font-size:13px;color:var(--ink);font-weight:600;margin-top:8px;"></p>
       <div class="divider"></div>
@@ -581,7 +584,7 @@ async function connectBLEPrinter(){
   }
 }
 
-function fmt(n){ return '₹' + n.toFixed(2); }
+function fmt(n){ return 'Rs.' + n.toFixed(2); }
 
 function recalcGrand(){
   let sum=0;
@@ -608,7 +611,7 @@ function addRow(name,qty,price){
     <td><input type="text" class="name-in" list="catalog" placeholder="Product name" value="${name||''}" style="width:100%;"></td>
     <td><input type="number" class="qty-in" min="0" step="1" value="${qty!=null?qty:''}" style="width:100%;text-align:center;"></td>
     <td><input type="number" class="price-in" min="0" step="0.5" value="${price!=null?price:''}" style="width:100%;text-align:right;"></td>
-    <td class="total-cell">₹0.00</td>
+    <td class="total-cell">Rs.0.00</td>
     <td><button class="remove-btn" type="button"><span class="icon"></span></button></td>
   `;
   rowsBody.appendChild(tr);
@@ -645,7 +648,7 @@ function populateReceipt(bill){
   document.getElementById('receipt-discount-label').textContent='Discount ('+bill.discountPct+'%)';
   document.getElementById('receipt-discount').textContent='-'+bill.discountAmt.toFixed(2);
   document.getElementById('receipt-total').textContent=fmt(bill.grandTotal);
-  document.getElementById('receipt-qr-label').textContent='Scan & pay '+fmt(bill.grandTotal);
+  document.getElementById('receipt-scanpay-label').textContent='Scan & Pay '+fmt(bill.grandTotal);
   document.getElementById('receipt-remarks').textContent = bill.remarks ? ('Note: '+bill.remarks) : '';
 }
 
