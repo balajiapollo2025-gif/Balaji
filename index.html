@@ -447,7 +447,7 @@ const BLE_OPTIONAL_SERVICES = [
 ];
 
 function buildReceiptTextPart1(bill){
-  const W = 32;
+  const W = 48;
   const center = (s)=>{ s=String(s); const pad=Math.max(0,Math.floor((W-s.length)/2)); return ' '.repeat(pad)+s; };
   const line = (ch)=> ch.repeat(W);
   const row = (l,r)=>{ l=String(l); r=String(r); const sp=Math.max(1,W-l.length-r.length); return l+' '.repeat(sp)+r; };
@@ -468,16 +468,15 @@ function buildReceiptTextPart1(bill){
   t += row('Subtotal', bill.subtotal.toFixed(2))+'\n';
   t += row('Discount ('+bill.discountPct+'%)', '-'+bill.discountAmt.toFixed(2))+'\n';
   t += line('-')+'\n';
-  t += row('TOTAL', fmt(bill.grandTotal))+'\n';
+  t += row('TOTAL', 'Rs.'+bill.grandTotal.toFixed(2))+'\n';
   t += line('-')+'\n';
   return t;
 }
 
 function buildReceiptTextPart2(bill){
-  const W = 32;
+  const W = 48;
   const center = (s)=>{ s=String(s); const pad=Math.max(0,Math.floor((W-s.length)/2)); return ' '.repeat(pad)+s; };
   let t = '';
-  t += center('Scan & pay '+fmt(bill.grandTotal))+'\n';
   t += center('UPI: paytmqr5ftk5t@ptys')+'\n';
   t += '-'.repeat(W)+'\n';
   if(bill.remarks) t += 'Note: '+bill.remarks+'\n';
