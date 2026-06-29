@@ -477,12 +477,11 @@ function buildReceiptTextPart1(bill){
 
 function buildReceiptTextPart2(bill){
   const W = 48;
-  const center = (s)=>{ s=String(s); const pad=Math.max(0,Math.floor((W-s.length)/2)); return ' '.repeat(pad)+s; };
-  let t = '';
-  t += center('UPI: paytmqr5ftk5t@ptys')+'\n';
+  let t = '\n';
+  t += 'UPI: paytmqr5ftk5t@ptys\n';
   t += '-'.repeat(W)+'\n';
   if(bill.remarks) t += 'Note: '+bill.remarks+'\n';
-  t += center('Thank you! Visit again')+'\n\n\n\n\n\n';
+  t += 'Thank you! Visit again\n\n\n\n\n\n';
   return t;
 }
 
