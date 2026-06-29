@@ -115,7 +115,7 @@
   .grand-row .value{font-size:18px;font-weight:700;}
   .error-msg{color:var(--red);font-size:12px;text-align:center;min-height:16px;margin-top:6px;}
 
-  .receipt{font-family:"Courier New",monospace;background:var(--paper);border:2px solid var(--ink);
+  .receipt{font-family:"Courier New",monospace;background:var(--paper);border:1.5px solid var(--ink);
     border-radius:var(--radius-md);padding:18px 16px;max-width:300px;margin:0 auto;}
   .receipt-center{text-align:center;}
   .receipt-shop-name{font-size:15px;font-weight:700;margin-bottom:4px;}
@@ -164,9 +164,6 @@
     #screen-receipt{display:block !important;padding:0;background:#fff !important;}
     #screen-receipt .receipt,#screen-receipt .receipt *{
       background:#fff !important;color:#000 !important;border-color:#999 !important;
-    }
-    #screen-receipt .receipt{
-      border:2px solid #000 !important;
     }
     @page{size:80mm auto;margin:4mm;}
   }
@@ -281,8 +278,9 @@
       <div class="divider"></div>
       <p class="receipt-thanks">Thank you! Visit again</p>
     </div>
-    <button class="btn btn-primary no-print" id="print-btn" style="margin-top:14px;"><span class="icon" data-icon="printer"></span>Print receipt</button>
-    <button class="btn btn-outline no-print" id="share-btn" style="margin-top:8px;"><span class="icon" data-icon="share"></span>Share / print via app</button>
+    <p class="printer-status no-print" id="ble-receipt-status" style="margin-bottom:4px;"></p>
+    <button class="btn btn-primary no-print" id="print-btn" style="margin-top:6px;"><span class="icon" data-icon="printer"></span>Print receipt</button>
+    <button class="btn btn-outline no-print" id="share-btn" style="margin-top:8px;"><span class="icon" data-icon="share"></span>Share / print via app — fallback</button>
     <p class="printer-status no-print" id="share-status"></p>
     <button class="btn btn-outline no-print" id="new-bill-btn" style="margin-top:8px;">New bill</button>
   </section>
@@ -421,6 +419,7 @@ function showScreen(name){
     b.classList.toggle('active', b.dataset.screen===navTarget);
   });
   if(name==='reports') renderReports();
+  if(name==='receipt') updateBleReceiptStatus();
   window.scrollTo(0,0);
 }
 document.getElementById('back-btn').addEventListener('click', ()=>showScreen('home'));
@@ -902,14 +901,30 @@ document.getElementById('app-update-btn').addEventListener('click', async ()=>{
   location.reload();
 });
 
+function updateBleReceiptStatus(){
+  const el = document.getElementById('ble-receipt-status');
+  const useDirect = document.getElementById('ble-direct-toggle').checked;
+  if(!useDirect){
+    el.textContent = 'Direct printer not enabled — turn it on in Printer settings';
+  } else if(bleCharacteristic){
+    el.textContent = '🔵 Direct printer connected — will print directly';
+  } else {
+    el.textContent = '⚠️ Not connected — open Printer settings and tap "Try direct Bluetooth connect"';
+  }
+}
+
 document.getElementById('print-btn').addEventListener('click', async ()=>{
   const useDirect = document.getElementById('ble-direct-toggle').checked;
+  const statusEl = document.getElementById('ble-receipt-status');
   if(useDirect && bleCharacteristic && currentReceiptBill){
     try{
+      statusEl.textContent = 'Printing...';
       await printViaBLE(currentReceiptBill);
+      statusEl.textContent = '✅ Printed';
+      setTimeout(updateBleReceiptStatus, 2000);
       return;
     } catch(e){
-      // fall through to system print dialog if direct printing fails
+      statusEl.textContent = 'Direct print failed, opening system dialog instead...';
     }
   }
   window.print();
@@ -921,7 +936,22 @@ document.getElementById('share-btn').addEventListener('click', async ()=>{
   shareStatus.textContent = 'Preparing image...';
   try{
     const receiptEl = document.querySelector('#screen-receipt .receipt');
-    const canvas = await html2canvas(receiptEl, {backgroundColor:'#ffffff', scale:2});
+    const canvas = await html2canvas(receiptEl, {
+      backgroundColor:'#ffffff',
+      scale:3,
+      onclone:(clonedDoc)=>{
+        const clonedReceipt = clonedDoc.querySelector('#screen-receipt .receipt');
+        if(!clonedReceipt) return;
+        clonedReceipt.style.background = '#ffffff';
+        clonedReceipt.style.borderColor = '#000000';
+        clonedReceipt.style.color = '#000000';
+        clonedReceipt.querySelectorAll('*').forEach(el=>{
+          el.style.color = '#000000';
+          el.style.backgroundColor = 'transparent';
+          el.style.borderColor = '#888888';
+        });
+      }
+    });
     canvas.toBlob(async (blob)=>{
       const file = new File([blob], 'receipt.png', {type:'image/png'});
       if(navigator.canShare && navigator.canShare({files:[file]})){
@@ -942,7 +972,7 @@ document.getElementById('share-btn').addEventListener('click', async ()=>{
       }
     });
   } catch(e){
-    shareStatus.textContent = 'Could not create image, try Print receipt instead';
+    shareStatus.textContent = 'Could not create image, try the system dialog fallback below';
   }
 });
 
