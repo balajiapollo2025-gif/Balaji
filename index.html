@@ -75,10 +75,10 @@
   .role-amber{background:var(--amber-light);color:var(--amber-dark);}
 
   .section-label{font-size:13px;font-weight:600;margin:18px 0 10px;}
-  .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-  .stat-card{border-radius:var(--radius-md);padding:10px 8px;}
-  .stat-card .label{font-size:10px;margin-bottom:4px;opacity:0.85;}
-  .stat-card .value{font-size:15px;font-weight:700;}
+  .stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+  .stat-card{border-radius:var(--radius-md);padding:12px;}
+  .stat-card .label{font-size:11px;margin-bottom:4px;opacity:0.85;}
+  .stat-card .value{font-size:17px;font-weight:700;}
   .stat-green{background:var(--green-light);color:var(--green-dark);}
   .stat-blue{background:var(--blue-light);color:var(--blue-dark);}
   .stat-amber{background:var(--amber-light);color:var(--amber-dark);}
@@ -224,9 +224,8 @@
 
     <p class="section-label" style="margin-top:18px;">Today's overview</p>
     <div class="stats-grid">
-      <div class="stat-card stat-green"><p class="label">Revenue</p><p class="value">Rs.48,250</p></div>
-      <div class="stat-card stat-blue"><p class="label">Bills today</p><p class="value">42</p></div>
-      <div class="stat-card stat-red"><p class="label">Low stock</p><p class="value">7 items</p></div>
+      <div class="stat-card stat-green"><p class="label">Today's revenue</p><p class="value" id="stat-revenue">Rs.0.00</p></div>
+      <div class="stat-card stat-blue"><p class="label">Bills today</p><p class="value" id="stat-bills">0</p></div>
     </div>
   </section>
 
@@ -419,6 +418,7 @@ function showScreen(name){
     b.classList.toggle('active', b.dataset.screen===navTarget);
   });
   if(name==='reports') renderReports();
+  if(name==='home') updateHomeStats();
   if(name==='receipt') updateBleReceiptStatus();
   window.scrollTo(0,0);
 }
@@ -701,6 +701,21 @@ function renderReports(){
 }
 renderReports();
 
+function updateHomeStats(){
+  const today = todayStr();
+  let revenue = 0, count = 0;
+  bills.forEach(b=>{
+    try{
+      const d = new Date(b.date);
+      const bd = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+      if(bd===today){ revenue += b.grandTotal; count++; }
+    }catch(e){}
+  });
+  document.getElementById('stat-revenue').textContent = fmt(revenue);
+  document.getElementById('stat-bills').textContent = count;
+}
+updateHomeStats();
+
 document.getElementById('save-bill').addEventListener('click', ()=>{
   const items=[];
   rowsBody.querySelectorAll('tr').forEach(tr=>{
@@ -742,8 +757,7 @@ document.getElementById('save-bill').addEventListener('click', ()=>{
   }
   store.set('bills', bills);
   renderReports();
-
-  populateReceipt(bill);
+  updateHomeStats();
 
   editingBillIndex = null;
   document.getElementById('save-bill-label').textContent = 'Save bill';
