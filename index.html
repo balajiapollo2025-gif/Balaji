@@ -759,6 +759,8 @@ document.getElementById('save-bill').addEventListener('click', ()=>{
   renderReports();
   updateHomeStats();
 
+  populateReceipt(bill);
+
   editingBillIndex = null;
   document.getElementById('save-bill-label').textContent = 'Save bill';
   rowsBody.innerHTML='';
